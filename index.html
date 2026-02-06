@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Миний Валентин болох уу? 💕</title>
+  <style>
+    :root {
+      --yes: #2ecc71;
+      --no: #ff4d4d;
+      --card-bg: rgba(255,255,255,0.18);
+      --card-border: rgba(255,255,255,0.28);
+      --shadow: 0 18px 50px rgba(0,0,0,0.25);
+      --text: #fff;
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      touch-action: manipulation;
+      transition: background 0.6s ease;
+    }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background:
+        radial-gradient(1200px 700px at 20% 20%, rgba(255,45,122,0.45), transparent 60%),
+        radial-gradient(900px 600px at 80% 30%, rgba(255,255,255,0.25), transparent 55%),
+        radial-gradient(1200px 900px at 60% 90%, rgba(46,204,113,0.25), transparent 60%),
+        linear-gradient(135deg, #2b1055, #7597de);
+      background-size: cover;
+      background-position: center;
+    }
+    .card {
+      width: min(520px, 96vw);
+      border-radius: 28px;
+      padding: 22px 18px 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      text-align: center;
+      position: relative;
+    }
+    .title {
+      font-weight: 900;
+      font-size: clamp(1.8rem, 6.5vw, 2.8rem);
+      line-height: 1.15;
+      margin-bottom: 10px;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .subtitle {
+      opacity: 0.9;
+      font-size: clamp(0.95rem, 3.6vw, 1.1rem);
+      margin-bottom: 16px;
+    }
+    .cat-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0 14px;
+    }
+    .cat {
+      width: min(280px, 72vw);
+      height: min(280px, 72vw);
+      object-fit: contain;
+      filter: drop-shadow(0 16px 28px rgba(0,0,0,0.35));
+    }
+    .playground {
+      position: relative;
+      width: 100%;
+      height: 150px;
+      margin-top: 10px;
+      touch-action: none;
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-weight: 900;
+      font-size: clamp(1.15rem, 4.6vw, 1.55rem);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 14px 35px rgba(0,0,0,0.25);
+      transition: transform 0.15s ease, filter 0.15s ease;
+      touch-action: manipulation;
+      min-width: 160px;
+    }
+    button:active { transform: scale(0.92); }
+    #yes {
+      background: linear-gradient(135deg, #19d36b, #3cff9b);
+      color: #0b3d20;
+      position: relative;
+      z-index: 5;
+    }
+    #no {
+      background: linear-gradient(135deg, #ff3b3b, #ff7b7b);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      will-change: transform, left, top;
+    }
+    .toast {
+      position: fixed;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      background: rgba(0,0,0,0.55);
+      color: white;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 1.05rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s ease;
+      z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      max-width: 92vw;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .heart {
+      position: fixed;
+      font-size: 2.1rem;
+      pointer-events: none;
+      animation: heartFloat 2.6s ease-out forwards;
+      z-index: 100;
+    }
+    @keyframes heartFloat {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(720deg); opacity: 0; }
+    }
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 14px;
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 1000;
+      animation: confettiFall 1.8s ease-out forwards;
+      opacity: 0.95;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(-20vh) rotate(0deg); }
+      100% { transform: translateY(120vh) rotate(720deg); }
+    }
+    /* Settings panel */
+    #settings-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255, 105, 180, 0.9);
+      color: white;
+      font-size: 28px;
+      border: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      cursor: pointer;
+      z-index: 2000;
+      backdrop-filter: blur(4px);
+    }
+    #settings-panel {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 300px;
+      max-height: 80vh;
+      overflow-y: auto;
+      background: rgba(30, 30, 50, 0.92);
+      color: white;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.15);
+      display: none;
+      z-index: 1999;
+    }
+    #settings-panel h3 {
+      margin: 0 0 14px;
+      color: #ff69b4;
+    }
+    #settings-panel label {
+      display: block;
+      margin: 12px 0 4px;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    #settings-panel input[type="text"],
+    #settings-panel input[type="url"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #555;
+      background: #222;
+      color: white;
+    }
+    #settings-panel input[type="color"] {
+      width: 100%;
+      height: 38px;
+      border: none;
+      border-radius: 8px;
+    }
+    #settings-panel button {
+      margin-top: 12px;
+      padding: 10px 16px;
+      font-size: 1rem;
+      min-width: auto;
+      box-shadow: none;
+    }
+    #settings-panel .row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    #settings-panel .small-btn {
+      flex: 1;
+    }
+    @media (max-width: 500px) {
+      #settings-panel {
+        width: 92vw;
+        right: 4vw;
+        bottom: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="title" id="mainTitle">Миний Валентин болох уу? 💖</div>
+    <div class="subtitle" id="subTitle">“Үгүй” гэж дарж чадахгүй шүү 😼</div>
+    <div class="cat-wrap">
+      <img id="cat" class="cat" alt="cute cat" draggable="false"/>
+    </div>
+    <div class="playground" id="playground">
+      <button id="yes">Тэгье 😊</button>
+      <button id="no">Үгүй 😿</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Хайртай шүү ❤️</div>
+
+  <!-- Settings -->
+  <button id="settings-toggle">⚙️</button>
+  <div id="settings-panel">
+    <h3>Customize Card</h3>
+
+    <label>Гол текст (title)</label>
+    <input type="text" id="customTitle" placeholder="Миний Валентин болох уу? 💖">
+
+    <label>Дэд текст (subtitle)</label>
+    <input type="text" id="customSub" placeholder="“Үгүй” гэж дарж чадахгүй шүү 😼">
+
+    <label>Yes товчны текст</label>
+    <input type="text" id="yesLabel" placeholder="Тэгье 😊">
+
+    <label>No товчны текст</label>
+    <input type="text" id="noLabel" placeholder="Үгүй 😿">
+
+    <label>Background color</label>
+    <input type="color" id="bgColor" value="#2b1055">
+
+    <label>Background image URL</label>
+    <input type="url" id="bgUrl" placeholder="https://... (optional)">
+
+    <label>эсвэл зураг upload хий (background)</label>
+    <input type="file" id="bgFile" accept="image/*">
+
+    <label>Cat GIF / image URL</label>
+    <input type="url" id="catUrl" placeholder="https://...giphy...">
+
+    <label>эсвэл cat зураг upload</label>
+    <input type="file" id="catFile" accept="image/*">
+
+    <label>Music (MP3)</label>
+    <input type="file" id="musicFile" accept="audio/*">
+
+    <div class="row">
+      <button id="applyBtn" style="background:#ff69b4;">Хадгалах</button>
+      <button id="resetBtn" style="background:#e74c3c;" class="small-btn">Reset</button>
+      <button id="closeBtn" style="background:#555;" class="small-btn">Хаах</button>
+    </div>
+
+    <div id="musicControls" style="margin-top:16px; display:none;">
+      <button id="playPause">Play</button>
+      <input type="range" id="volume" min="0" max="1" step="0.01" value="0.4">
+    </div>
+  </div>
+
+  <audio id="bgMusic" loop></audio>
+
+  <script>
+    // ──────────────────────────────────────────────
+    //  Original logic (cat, no button, yes action...)
+    // ──────────────────────────────────────────────
+    const yesBtn = document.getElementById("yes");
+    const noBtn = document.getElementById("no");
+    const cat = document.getElementById("cat");
+    const toast = document.getElementById("toast");
+    const playground = document.getElementById("playground");
+    const mainTitle = document.getElementById("mainTitle");
+    const subTitle = document.getElementById("subTitle");
+
+    const normalGif = "https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.webp";
+    const happyGif = "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.webp";
+    const fallbackNormal = "https://media.giphy.com/media/JIX9t2j0ZTN9S/480w_s.jpg";
+    const fallbackHappy = "https://media.giphy.com/media/MDJ9IbxxvDUQM/480w_s.jpg";
+
+    function setGif(url, fallbackUrl) {
+      cat.src = "";
+      const img = new Image();
+      img.onload = () => { cat.src = url + "?v=" + Date.now(); };
+      img.onerror = () => { cat.src = fallbackUrl + "?v=" + Date.now(); };
+      img.src = url;
+    }
+
+    setGif(normalGif, fallbackNormal);
+
+    function showToast(msg, duration = 2200) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), duration);
+    }
+
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+    let isMoving = false;
+    function setNoPos(px, py) {
+      noBtn.style.left = px + "px";
+      noBtn.style.top = py + "px";
+      noBtn.style.transform = "translate(-50%, -50%)";
+    }
+
+    function animateNoTo(targetPx, targetPy) {
+      if (isMoving) return;
+      isMoving = true;
+      const startX = noBtn.offsetLeft;
+      const startY = noBtn.offsetTop;
+      const start = performance.now();
+      const duration = 280;
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+      function frame(now) {
+        const t = clamp((now - start) / duration, 0, 1);
+        const e = easeOut(t);
+        const x = startX + (targetPx - startX) * e;
+        const y = startY + (targetPy - startY) * e;
+        setNoPos(x, y);
+        if (t < 1) requestAnimationFrame(frame);
+        else isMoving = false;
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function moveNoButton(e) {
+      if (e.touches) e.preventDefault();
+      const area = playground.getBoundingClientRect();
+      const bw = noBtn.offsetWidth;
+      const bh = noBtn.offsetHeight;
+      const minX = bw / 2 + 10;
+      const maxX = area.width - bw / 2 - 10;
+      const minY = bh / 2 + 10;
+      const maxY = area.height - bh / 2 - 10;
+      let x = Math.random() * (maxX - minX) + minX;
+      let y = Math.random() * (maxY - minY) + minY;
+      const yesRect = yesBtn.getBoundingClientRect();
+      const yesCenterX = (yesRect.left + yesRect.right) / 2 - area.left;
+      const yesCenterY = (yesRect.top + yesRect.bottom) / 2 - area.top;
+      if (Math.hypot(x - yesCenterX, y - yesCenterY) < 130) {
+        x = clamp(x + 150 + Math.random()*40, minX, maxX);
+        y = clamp(y + 80 + Math.random()*40, minY, maxY);
+      }
+      animateNoTo(x, y);
+      if (Math.random() < 0.4) {
+        const msgs = [
+          "Хаха, үгүй гэж байхгүй шүү 😼",
+          "Барьж чадвал л дар дааа 😹",
+          "Тэгье гэдэг товч л дарчих 😌",
+          "Битгий би гомдлоо шүү 🥺💕"
+        ];
+        showToast(msgs[Math.floor(Math.random() * msgs.length)], 1600);
+      }
+    }
+
+    noBtn.addEventListener("pointerdown", moveNoButton, { passive: false });
+    noBtn.addEventListener("touchstart", moveNoButton, { passive: false });
+    noBtn.addEventListener("touchmove", moveNoButton, { passive: false });
+
+    function confettiBoom() {
+      const count = 100;
+      for (let i = 0; i < count; i++) {
+        const c = document.createElement("div");
+        c.className = "confetti";
+        const hue = Math.floor(Math.random() * 360);
+        c.style.background = `hsl(${hue} 95% 60%)`;
+        c.style.left = (Math.random() * 100) + "vw";
+        c.style.top = (-10 - Math.random() * 40) + "vh";
+        c.style.width = (6 + Math.random() * 12) + "px";
+        c.style.height = (10 + Math.random() * 18) + "px";
+        c.style.animationDuration = (1.2 + Math.random() * 1.4).toFixed(2) + "s";
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3000);
+      }
+    }
+
+    function heartsRain() {
+      for (let i = 0; i < 24; i++) {
+        const heart = document.createElement("div");
+        heart.className = "heart";
+        heart.textContent = ["❤️","💖","💘","💕","💗"][Math.floor(Math.random()*5)];
+        heart.style.left = `${Math.random() * 100}vw`;
+        heart.style.top = `${Math.random() * 40 + 60}vh`;
+        heart.style.animationDelay = `${Math.random() * 0.8}s`;
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 3800);
+      }
+    }
+
+    yesBtn.addEventListener("click", () => {
+      showToast("Валентин минь болсонд баярлалаа! Чи хамгийн сайхан хүн шүү 💘🥹", 4000);
+      setGif(happyGif, fallbackHappy);
+      confettiBoom();
+      heartsRain();
+      noBtn.disabled = true;
+      noBtn.style.opacity = "0.15";
+      noBtn.style.filter = "grayscale(1) blur(1px)";
+      noBtn.style.pointerEvents = "none";
+    });
+
+    window.addEventListener("resize", () => {
+      setNoPos(playground.clientWidth / 2, playground.clientHeight / 2);
+    });
+    setNoPos(playground.clientWidth / 2, playground.clientHeight / 2);
+
+    // ──────────────────────────────────────────────
+    //  Customization panel
+    // ──────────────────────────────────────────────
+    const toggle = document.getElementById("settings-toggle");
+    const panel = document.getElementById("settings-panel");
+    const applyBtn = document.getElementById("applyBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const closeBtn = document.getElementById("closeBtn");
+
+    toggle.addEventListener("click", () => {
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    });
+
+    closeBtn.addEventListener("click", () => {
+      panel.style.display = "none";
+    });
+
+    // Load saved settings
+    window.addEventListener("load", () => {
+      const saved = JSON.parse(localStorage.getItem("valentineCardCustom") || "{}");
+
+      if (saved.title) {
+        mainTitle.innerHTML = saved.title;
+        document.getElementById("customTitle").value = saved.title;
+      }
+      if (saved.subtitle) {
+        subTitle.innerHTML = saved.subtitle;
+        document.getElementById("customSub").value = saved.subtitle;
+      }
+      if (saved.yesLabel) {
+        yesBtn.innerHTML = saved.yesLabel;
+        document.getElementById("yesLabel").value = saved.yesLabel;
+      }
+      if (saved.noLabel) {
+        noBtn.innerHTML = saved.noLabel;
+        document.getElementById("noLabel").value = saved.noLabel;
+      }
+      if (saved.bgColor) {
+        document.body.style.background = saved.bgColor;
+        document.getElementById("bgColor").value = saved.bgColor;
+      }
+      if (saved.bgImage) {
+        document.body.style.background = `url(${saved.bgImage}) center/cover`;
+      }
+      if (saved.catImage) {
+        setGif(saved.catImage, saved.catImage);
+        document.getElementById("catUrl").value = saved.catImage;
+      }
+    });
+
+    // Apply
+    applyBtn.addEventListener("click", () => {
+      const data = {};
+
+      const titleVal = document.getElementById("customTitle").value.trim();
+      if (titleVal) {
+        mainTitle.innerHTML = titleVal;
+        data.title = titleVal;
+      }
+
+      const subVal = document.getElementById("customSub").value.trim();
+      if (subVal) {
+        subTitle.innerHTML = subVal;
+        data.subtitle = subVal;
+      }
+
+      const yesVal = document.getElementById("yesLabel").value.trim();
+      if (yesVal) {
+        yesBtn.innerHTML = yesVal;
+        data.yesLabel = yesVal;
+      }
+
+      const noVal = document.getElementById("noLabel").value.trim();
+      if (noVal) {
+        noBtn.innerHTML = noVal;
+        data.noLabel = noVal;
+      }
+
+      const color = document.getElementById("bgColor").value;
+      if (color) {
+        document.body.style.background = color;
+        data.bgColor = color;
+      }
+
+      const bgUrlVal = document.getElementById("bgUrl").value.trim();
+      if (bgUrlVal) {
+        document.body.style.background = `url(${bgUrlVal}) center/cover`;
+        data.bgImage = bgUrlVal;
+      }
+
+      const catUrlVal = document.getElementById("catUrl").value.trim();
+      if (catUrlVal) {
+        setGif(catUrlVal, catUrlVal);
+        data.catImage = catUrlVal;
+      }
+
+      localStorage.setItem("valentineCardCustom", JSON.stringify(data));
+    });
+
+    // Reset
+    resetBtn.addEventListener("click", () => {
+      localStorage.removeItem("valentineCardCustom");
+      location.reload();
+    });
+
+    // File uploads ────────────────────────────────
+    document.getElementById("bgFile").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      document.body.style.background = `url(${url}) center/cover`;
+    });
+
+    document.getElementById("catFile").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      setGif(url, url);
+    });
+
+    // Music ───────────────────────────────────────
+    const audio = document.getElementById("bgMusic");
+    const musicInput = document.getElementById("musicFile");
+    const playPauseBtn = document.getElementById("playPause");
+    const volumeSlider = document.getElementById("volume");
+    const musicControls = document.getElementById("musicControls");
+
+    musicInput.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      audio.src = url;
+      audio.volume = volumeSlider.value;
+      musicControls.style.display = "block";
+      audio.play().catch(() => showToast("Play товчийг дарж хөгжим эхлүүлнэ үү", 3000));
+    });
+
+    playPauseBtn.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.textContent = "Pause";
+      } else {
+        audio.pause();
+        playPauseBtn.textContent = "Play";
+      }
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = volumeSlider.value;
+    });
+  </script>
+</body>
+</html>
